@@ -24,10 +24,16 @@
     }
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.8.1",
+    "classnames": "^2.2.6",
     "electron-is-dev": "^1.0.1",
+    "fluent-ffmpeg": "^2.1.2",
     "react": "^16.8.3",
+    "react-bootstrap": "^1.0.0-beta.6",
     "react-dom": "^16.8.3",
-    "react-scripts": "2.1.5"
+    "react-scripts": "2.1.5",
+    "react-toastify": "^5.1.0",
+    "ytdl-core": "^0.29.5"
   },
   "homepage": "./",
   "main": "public/electron.js",
@@ -36,7 +42,7 @@
     "build": "rescripts build",
     "test": "rescripts test",
     "eject": "react-scripts eject",
-    "electron-dev": "concurrently \"BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron-dev": "concurrently \"cross-env BROWSER=none PORT=7000 yarn start\" \"wait-on http://localhost:7000 && electron .\" --kill-others",
     "postinstall": "electron-builder install-app-deps",
     "preelectron-pack": "yarn build",
     "electron-pack": "build -mw"
@@ -44,6 +50,9 @@
   "eslintConfig": {
     "extends": "react-app"
   },
+  "rescripts": [
+    "env"
+  ],
   "browserslist": [
     ">0.2%",
     "not dead",
@@ -53,9 +62,13 @@
   "devDependencies": {
     "@rescripts/cli": "^0.0.10",
     "@rescripts/rescript-env": "^0.0.5",
+    "caniuse-lite": "^1.0.30000989",
     "concurrently": "^4.1.0",
+    "cross-env": "^5.2.1",
     "electron": "^4.0.6",
     "electron-builder": "^20.38.5",
+    "electron-devtools-installer": "^2.2.4",
+    "node-sass": "^4.12.0",
     "typescript": "^3.3.3333",
     "wait-on": "^3.2.0"
   }
