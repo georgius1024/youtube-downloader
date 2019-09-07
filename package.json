@@ -4,13 +4,13 @@
   "version": "0.1.0",
   "private": true,
   "author": {
-    "name": "Your Name",
-    "email": "your.email@domain.com",
-    "url": "https://your-website.com"
+    "name": "Georgius",
+    "email": "georgius@ural.ru",
+    "url": "https://github.com/georgius1024/youtube-downloader"
   },
   "build": {
     "appId": "com.my-website.my-app",
-    "productName": "MyApp",
+    "productName": "MyYoutubeDownloader",
     "copyright": "Copyright © 2019 ${author}",
     "mac": {
       "category": "public.app-category.utilities"
@@ -45,7 +45,9 @@
     "electron-dev": "concurrently \"cross-env BROWSER=none PORT=7000 yarn start\" \"wait-on http://localhost:7000 && electron .\" --kill-others",
     "postinstall": "electron-builder install-app-deps",
     "preelectron-pack": "yarn build",
-    "electron-pack": "build -mw"
+    "electron-pack": "build -mw",
+    "electron-pack-win": "build -w",
+    "electron-pack-linux": "build -l"
   },
   "eslintConfig": {
     "extends": "react-app"

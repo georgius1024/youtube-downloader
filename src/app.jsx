@@ -6,12 +6,12 @@ import 'react-toastify/dist/ReactToastify.css'
 import Card from 'react-bootstrap/Card'
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
-import { ToastContainer } from 'react-toastify'
+import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import ytdl from 'ytdl-core'
 const remote = window.require('electron').remote
 const fs = remote.require('fs')
-
+const downloadDir = './download'
 const storageKey = 'last-url'
 
 class App extends PureComponent {
@@ -20,7 +20,14 @@ class App extends PureComponent {
     this.doDownload = this.doDownload.bind(this)
     this.updateUrl = this.updateUrl.bind(this)
     this.state = {
-      url: localStorage.getItem(storageKey) || ''
+      url: localStorage.getItem(storageKey) || '',
+      downloading: false,
+      progress: 0,
+      startTime: null,
+      estimatedTime: 0
+    }
+    if (!fs.existsSync(downloadDir)) {
+      fs.mkdirSync(downloadDir)
     }
   }
   updateUrl({ target: { value } }) {
@@ -32,11 +39,53 @@ class App extends PureComponent {
   async doDownload() {
     const info = await ytdl.getBasicInfo(this.state.url)
     console.log(info)
-    const title = info.player_response.videoDetails.title
-
-    ytdl(this.state.url, {
+    // Setup video source
+    const input = ytdl(this.state.url, {
       format: 'mp4'
-    }).pipe(fs.createWriteStream(`${title}.mp4`))
+    })
+    input.once('response', () => {
+      this.setState({
+        downloading: true,
+        progress: 0,
+        startTime: Date.now(),
+        estimatedTime: 0
+      })
+      toast.info('Скачивание началось')
+    })
+    input.on('progress', (chunkLength, downloaded, total) => {
+      const percent = downloaded / total
+      const downloadedTime = Date.now() - this.state.startTime
+      this.setState({
+        progress: Math.floor(percent * 100),
+        estimatedTime: downloadedTime * (1 - 1 / percent)
+      })
+    })
+
+    // Setup file destination
+    const title = info.player_response.videoDetails.title
+    const baseName = title.replace(/[^a-z0-9]/gi, '_').toLowerCase()
+    const output = fs.createWriteStream(`${downloadDir}/${baseName}.mp4`)
+    input.on('end', () => {
+      toast.info(`Скачивание завершено. Файл: ${baseName}.mp4`)
+      this.setState({
+        downloading: false,
+        progress: 0
+      })
+    })
+
+    input.pipe(output)
+  }
+  progress() {
+    if (this.state.downloading && !isNaN(this.state.progress)) {
+      return (
+        <>
+          <p>Downloading: {this.state.progress.toFixed(2)}%</p>
+          <p>Time left: {this.state.estimatedTime.toFixed(2)}</p>
+        </>
+      )
+    } else if (this.state.downloading) {
+      return <div className="loading" />
+    }
   }
   render() {
     return (
@@ -69,6 +118,7 @@ class App extends PureComponent {
                 </footer>
               </Card.Body>
             </Card>
+            {this.progress()}
           </div>
         </div>
       </>

@@ -1,0 +1,11 @@
+.loading {
+  background-color: chocolate;
+  z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  cursor: wait;
+  opacity: 0.5;
+}
